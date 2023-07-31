@@ -1,20 +1,10 @@
 FROM maven:3.8.6-openjdk-18-slim
 LABEL author="Matvei Morenkov"
 
-# 1. Add pom.xml only here
+COPY pom.xml .
+RUN mvn clean package -DskipTests
 
-ADD ./pom.xml ./pom.xml
+WORKDIR /app
+COPY target/task-tracker-scheduler-0.0.1-SNAPSHOT.jar /app/task-tracker-scheduler.jar
 
-# 2. Start downloading dependencies
-
-RUN ["mvn", "verify", "clean", "--fail-never"]
-
-# 3. Add all source code and start compiling
-
-ADD ./src ./src
-
-RUN ["mvn", "package"]
-
-EXPOSE 8082
-
-CMD ["java", "-jar", "./target/task-tracker-scheduler-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "task-tracker-scheduler.jar"]
