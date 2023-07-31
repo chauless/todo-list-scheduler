@@ -17,8 +17,8 @@ public class SchedulerService {
     private final RabbitMessageSender rabbitMessageSender;
     private final SummaryService summaryService;
 
-//    @Scheduled(cron = "0 0 0 * * *") // every day at midnight
-    @Scheduled(cron = "0 */5 * * * *") // every 5 minutes for testing
+    @Scheduled(cron = "0 0 0 * * *") // every day at midnight
+//    @Scheduled(cron = "0 */5 * * * *") // every 5 minutes for testing
     public void sendSummaryEmails(){
         Timestamp now = Timestamp.valueOf(LocalDateTime.now());
         Timestamp previous = Timestamp.valueOf(LocalDateTime.now().minusHours(24));

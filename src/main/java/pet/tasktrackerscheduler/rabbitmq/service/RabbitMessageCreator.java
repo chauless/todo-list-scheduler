@@ -22,7 +22,7 @@ public class RabbitMessageCreator {
     public EmailDto createSummaryMessage(SummaryDto summary) {
         EmailDto emailDto = new EmailDto();
 
-        String subject = "Summary";
+        String subject = "Task Tracker Summary";
 
         emailDto.setReceiverEmail(summary.getReceiverEmail());
         emailDto.setSubject(subject);
@@ -54,14 +54,16 @@ public class RabbitMessageCreator {
     protected String getBodyForCompleted(SummaryDto summary) {
         String tasksCompleted = getTasksTitles(summary.getCompletedTodayTitles());
 
-        return String.format("Good job! Today you completed %d tasks! Some of them: %s.",
+        return String.format("Hi, this is your summary of your tasks for the last 24 hours. \n \n" +
+                        "Good job! Today you completed %d tasks! Some of them: %s.",
                 summary.getCompletedTodayCount(), tasksCompleted);
     }
 
     protected String getGetBodyForNotCompleted(SummaryDto summary) {
         String taskNotCompleted = getTasksTitles(summary.getNotCompletedTitles());
 
-        return String.format("You have %d tasks to do! Some of them: %s.",
+        return String.format("Hi, this is your summary of your tasks for the last 24 hours. \n \n" +
+                        "You have %d tasks to do! Some of them: %s.",
                 summary.getNotCompletedCount(), taskNotCompleted);
     }
 
@@ -70,8 +72,9 @@ public class RabbitMessageCreator {
         String tasksCompleted = getTasksTitles(summary.getCompletedTodayTitles());
         String taskNotCompleted = getTasksTitles(summary.getNotCompletedTitles());
 
-        return String.format("Good job! Today you completed %d tasks! Some of them: %s. But dont relax! " +
-                "You also have %d tasks to do! Some of them: %s.",
+        return String.format("Hi, this is your summary of your tasks for the last 24 hours. \n \n" +
+                        "Good job! Today you completed %d task(s)! Some of them: %s. \n" +
+                        "But dont relax! You also have %d tasks to do! Some of them %s.",
                 summary.getCompletedTodayCount(), tasksCompleted, summary.getNotCompletedCount(), taskNotCompleted);
     }
 
