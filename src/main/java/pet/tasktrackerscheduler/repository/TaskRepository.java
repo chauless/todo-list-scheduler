@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, UUID> {
+public interface TaskRepository extends JpaRepository<Task, Long> {
     Integer countTasksByUserAndCompletedAtBetween(User user, Timestamp previous, Timestamp now);
 
     List<Task> getTasksByUserAndCompletedAtBetween(User user, Timestamp previous, Timestamp now);
