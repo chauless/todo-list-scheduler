@@ -7,6 +7,9 @@ import pet.tasktrackerscheduler.repository.UserRepository;
 import pet.tasktrackerscheduler.scheduler.dto.SummaryDto;
 import pet.tasktrackerscheduler.scheduler.model.Task;
 import pet.tasktrackerscheduler.scheduler.model.User;
+import pet.tasktrackerscheduler.scheduler.service.strategy.CompletedTasksStrategy;
+import pet.tasktrackerscheduler.scheduler.service.strategy.NotCompletedTasksStrategy;
+import pet.tasktrackerscheduler.scheduler.service.strategy.SummaryStrategy;
 
 import java.sql.Timestamp;
 import java.util.LinkedList;
@@ -20,29 +23,32 @@ public class SummaryService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
 
-    public List<SummaryDto> getSummaryList(Timestamp now, Timestamp previous){
+    public List<SummaryDto> getSummaryList(Timestamp now, Timestamp previous) {
         List<SummaryDto> summaryList = new LinkedList<>();
         List<User> users = userRepository.findAll();
 
-        for (User usr: users) {
+        SummaryStrategy completedTasksStrategy = new CompletedTasksStrategy(taskRepository);
+        SummaryStrategy notCompletedTasksStrategy = new NotCompletedTasksStrategy(taskRepository);
+
+        for (User user : users) {
             SummaryDto summaryDto = new SummaryDto();
 
-            //getCompletedTodayTitles
-            List<Task> completedToday = taskRepository.getTasksByUserAndCompletedAtBetween(usr, previous, now);
+            // Используем стратегию для получения выполненных задач
+            List<Task> completedToday = completedTasksStrategy.getTasks(user, previous, now);
             List<String> completedTodayTitles = completedToday.stream()
                     .map(Task::getTitle)
                     .collect(Collectors.toList());
             Integer completedTodayCount = completedToday.size();
 
-            //getNotCompletedTitles
-            List<Task> notCompleted = taskRepository.getTasksByUserAndCompleted(usr, false);
+            // Используем стратегию для получения невыполненных задач
+            List<Task> notCompleted = notCompletedTasksStrategy.getTasks(user, previous, now);
             List<String> notCompletedTitles = notCompleted.stream()
                     .map(Task::getTitle)
                     .collect(Collectors.toList());
             Integer notCompletedCount = notCompleted.size();
 
-            //getSummaryDto
-            summaryDto.setReceiverEmail(usr.getUsername());
+            // Заполняем SummaryDto
+            summaryDto.setReceiverEmail(user.getUsername());
             summaryDto.setCompletedTodayCount(completedTodayCount);
             summaryDto.setCompletedTodayTitles(completedTodayTitles);
             summaryDto.setNotCompletedCount(notCompletedCount);
@@ -53,3 +59,4 @@ public class SummaryService {
         return summaryList;
     }
 }
+
